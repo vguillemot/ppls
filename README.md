@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Penalized PLS
+# ppls: Penalized Partial Least Squares for Structured and Functional Data
 
 <!-- badges: start -->
 
@@ -16,7 +16,7 @@ This R package implements a flexible and powerful framework for
 **penalized Partial Least Squares (PPLS)**, including:
 
 - B-spline basis transformations of the input data,
-- Construction of difference penalty matrices,
+- Construction of penalty matrices,
 - Cross-validation for hyperparameter tuning (`lambda`, `ncomp`),
 - Visualization of component effects,
 - Jackknife-based inference (covariance, t-tests),
@@ -53,66 +53,24 @@ included in the package:
 ``` r
 library(ppls)
 
-# Load data
+# Load cookie data
 data(cookie)
-X <- as.matrix(cookie$NIR)  # NIR spectra
-y <- as.vector(cookie$constituents$fat)    # Fat content
+X <- as.matrix(cookie$NIR)
+y <- cookie$constituents$fat
 
-# Run cross-validation with splines
-result <- ppls.splines.cv(
-  X, y,
-  lambda = c(10, 100, 500),
-  ncomp = 5,
-  degree = 3,
-  order = 2,
-  nknot = 20
+# Fit a 2-component kernel PPLS 
+fit.kpls <- penalized.pls(
+  X = X, y = y,
+  kernel = TRUE, 
+  ncomp = 2
 )
 
-# Extract optimal lambda and number of components
-result$lambda.opt
-result$ncomp.opt
-```
+# Predict on train data
+yhat <- new.penalized.pls(ppls = fit.kpls, Xtest = X, ytest = y)$ypred
 
-------------------------------------------------------------------------
-
-## Visualizing Components
-
-``` r
-# Plot fitted additive components
-graphic.ppls.splines(
-  X, y,
-  lambda = result$lambda.opt,
-  ncomp = result$ncomp.opt,
-  add.data = TRUE,
-  select = TRUE,
-  window.size = c(3, 4)
-)
-```
-
-------------------------------------------------------------------------
-
-## Inference with Jackknife
-
-``` r
-# Jackknife estimation and t-tests
-jack <- jack.ppls(result)
-coef(jack)
-vcov(jack)
-
-t.stats <- ttest.ppls(result)
-t.stats$pvalues
-```
-
-------------------------------------------------------------------------
-
-## Simulated Data
-
-The function `sim.data.ppls()` allows generating synthetic nonlinear
-data for benchmarking:
-
-``` r
-sim <- sim.data.ppls(ntrain = 100, ntest = 100, stnr = 3, p = 20)
-str(sim)
+# Plot predicted vs observed
+plot(yhat[,1], y, xlab = "Fitted", ylab = "Observed", pch = 16, asp = 1)
+abline(0, 1, col = "blue", lty = 2)
 ```
 
 ------------------------------------------------------------------------
