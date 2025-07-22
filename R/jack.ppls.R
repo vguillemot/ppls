@@ -48,11 +48,11 @@ jack.ppls <- function(ppls.object,
   k <- mydims[4]
   if (ncomp > ncomp.cv) {
     ncomp = ncomp.cv
-    cat(paste("ncomp is too large and set to ", ncomp, ".\n"))
+    message(paste("ncomp is too large and set to ", ncomp, ".\n"))
   }
   if (index.lambda > length(ppls.object$lambda)) {
     index.lambda <- length(ppls.object$lambda)
-    cat(paste("index of lambda is too large and set to ", index.lambda, " .\n"))
+    message(paste("index of lambda is too large and set to ", index.lambda, " .\n"))
   }
   index.lambda <- ppls.object$index.lambda
   p <- length(ppls.object$coefficients)

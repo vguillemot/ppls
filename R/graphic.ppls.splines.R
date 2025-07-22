@@ -105,6 +105,8 @@ graphic.ppls.splines <- function(X,
     Ytest[, i] <- Ztest[, start:end] %*% ppls.coefficients[start:end]
   }
   # plot the predicted functions
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(par(oldpar))
   par(mfrow = window.size)
   for (i in 1:p) {
     plot(
